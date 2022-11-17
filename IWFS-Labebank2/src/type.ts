@@ -1,5 +1,5 @@
 export type Cliente = {
-    id: string,
+    id: number,
     nome: string,
     CPF: string,
     nascimento: string,
