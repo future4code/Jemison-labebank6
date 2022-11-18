@@ -121,6 +121,19 @@ app.get('/saldo',(req:Request, res:Response)=>{
             throw new Error("CPF não fornecido");
         }
 
+        // Validando CPF
+        const validando = clientes.find((validar)=>{
+            if(validar.CPF === CPF) {
+              return   `Deu bom ${CPF}`
+            }
+            return
+        })
+
+        if(validando  === undefined){
+            errorCode
+            throw new Error(`CPF ${CPF} não cadastrado.`);
+        }
+                
         // Filtra o array de usuarios.
         let filtro = clientes.find((busca)=>{
             return(
@@ -203,7 +216,7 @@ app.put('/pagamento',(req:Request, res:Response) =>{
             throw new Error("Descrição não informada.");
         }else if(!CPF){
             errorCode
-            throw new Error("CPF não informada.");
+            throw new Error("CPF não informado.");
         }
 
         // Colocando data atual em caso de não passar uma data para agendamento.
@@ -270,6 +283,53 @@ app.put('/pagamento',(req:Request, res:Response) =>{
 
         res.status(200).send(validando)
     
+    }catch(error: any) {
+        res.status(errorCode).send(error.message)
+    }
+})
+
+// TRANSFERENCIA
+app.put('/transferencia',(req:Request, res:Response) =>{
+
+    try{
+
+        let {valor, CPF, nome, CPFDestino, nomeDestino} = req.body
+
+        if(!valor){
+            errorCode
+            throw new Error("Valor não informado.");
+        }else if(!nome || !nomeDestino){
+            errorCode
+            throw new Error("Nome não informado.");
+        }else if(!CPF || !CPFDestino){
+            errorCode
+            throw new Error("CPF não informado.");
+        }
+
+        // Conta titular.
+         clientes.find((titular) =>{
+            if(titular.CPF === CPF){
+                return titular.extrato.saldo = titular.extrato.saldo - valor
+            }
+        })
+
+        // Conta destinatario.
+         clientes.find((destino) =>{
+            if(destino.CPF === CPFDestino){
+                return destino.extrato.saldo = destino.extrato.saldo + valor
+            }
+        })
+
+        function dataAtual(){
+            let dataAtual = new Date();
+            let anoAtual = dataAtual.getFullYear();
+            let mesAtual = dataAtual.getMonth()+1;
+            let diaAtual = dataAtual.getUTCDate();
+            return `${diaAtual}/${mesAtual}/${anoAtual}`
+            }
+
+        res.status(200).send(`Transferencia realizada dia ${dataAtual()}`)
+
     }catch(error: any) {
         res.status(errorCode).send(error.message)
     }
