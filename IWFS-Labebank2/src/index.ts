@@ -10,7 +10,13 @@ app.use(express.json())
 
 app.use(cors())
 
-//CRIANDO CLIENTE
+// TODOS OS USUARIOS ======================================
+
+app.get('/usuarios',(req: Request, res: Response)=>{
+    res.status(200).send(clientes)
+})
+
+//CRIANDO CLIENTE ==========================================
 
 app.post('/create', (req: Request, res: Response) => {
 
@@ -96,6 +102,76 @@ app.post('/create', (req: Request, res: Response) => {
     }
 })
 
+// PEGANDO SALDO =====================================================
+app.get('/saldo',(req:Request, res:Response)=>{
+    
+    let errorCode = 400;
+
+    try {
+        // Pegando as propriedades
+        const {nome, CPF} = req.body
+
+        if(!nome){
+            errorCode = 422
+            throw new Error("Nome não fornecido");
+        }else if(!CPF){
+            errorCode = 422
+            throw new Error("CPF não fornecido");
+        }
+
+        // Filtra o array de usuarios.
+        let filtro = clientes.find((busca)=>{
+            return(
+                busca.CPF === CPF && busca.nome.toUpperCase() === nome.toUpperCase()
+            )
+        })
+        
+        res.status(200).send(filtro?.extrato)
+
+    }catch (error: any) {
+        res.status(errorCode).send(error.message)
+    }
+})
+
+// ADICIONAR SALDO ================================================ 
+
+app.patch('/adicionando',(req:Request, res:Response)=>{
+    
+    let errorCode = 400;
+
+    try {
+        // Pegando as propriedades
+        const {nome, CPF, saldo} = req.body
+
+        if(!nome){
+            errorCode = 422
+            throw new Error("Nome não fornecido");
+        }else if(!CPF){
+            errorCode = 422
+            throw new Error("CPF não fornecido");
+        }else if(!saldo){
+            errorCode = 422
+            throw new Error("Saldo não fornecido");
+        }
+
+        // Adicionando novo saldo.
+        clientes.find((busca)=>{
+            if (busca.CPF === CPF && busca.nome.toUpperCase() === nome.toUpperCase()){
+               return busca.extrato.saldo = saldo
+            }else{
+                errorCode = 422
+            throw new Error("CPF ou NOME errado!");
+            }
+        })
+
+        res.status(200).send("Novo saldo adicionado com sucesso!")
+
+    }catch (error: any) {
+        res.status(errorCode).send(error.message)
+    }
+})
+
+// PAGAR CONTA
 
 
 
