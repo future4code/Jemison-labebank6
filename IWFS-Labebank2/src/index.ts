@@ -156,6 +156,7 @@ app.patch('/adicionando',(req:Request, res:Response)=>{
     try {
         // Pegando as propriedades
         const {nome, CPF, saldo} = req.body
+        let data
 
         if(!nome){
             errorCode = 422
@@ -181,10 +182,20 @@ app.patch('/adicionando',(req:Request, res:Response)=>{
             throw new Error(`CPF ${CPF} não foi cadastrado.`);
         }
 
-        // Adicionando novo saldo.
+        function dataAtual(){
+            let dataAtual = new Date();
+            let anoAtual = dataAtual.getFullYear();
+            let mesAtual = dataAtual.getMonth()+1;
+            let diaAtual = dataAtual.getUTCDate();
+            return data = `${diaAtual}/${mesAtual}/${anoAtual}`
+            }
+
+        // Adicionando novo saldo com a data atual.
         let adicionando = clientes.find((busca)=>{
             if (busca.CPF === CPF && busca.nome.toUpperCase() === nome.toUpperCase()){
-               return busca.extrato.saldo = saldo
+                return (busca.extrato.saldo = busca.extrato.saldo + saldo,
+                 busca.extrato.data = dataAtual(),
+                 busca.extrato.descricao = "Deposito realizado em Dinheiro.")
             }
         })
 
@@ -193,7 +204,7 @@ app.patch('/adicionando',(req:Request, res:Response)=>{
             throw new Error("Nome não compativel com CPF informado.");
         }
 
-        res.status(200).send("Novo saldo adicionado com sucesso!")
+        res.status(200).send(adicionando)
 
     }catch (error: any) {
         res.status(errorCode).send(error.message)
@@ -307,11 +318,12 @@ app.put('/transferencia',(req:Request, res:Response) =>{
         }
 
         // Conta titular.
-         clientes.find((titular) =>{
+        let titula = clientes.find((titular) =>{
             if(titular.CPF === CPF){
                 return titular.extrato.saldo = titular.extrato.saldo - valor
             }
         })
+
 
         // Conta destinatario.
          clientes.find((destino) =>{
@@ -326,7 +338,7 @@ app.put('/transferencia',(req:Request, res:Response) =>{
             let mesAtual = dataAtual.getMonth()+1;
             let diaAtual = dataAtual.getUTCDate();
             return `${diaAtual}/${mesAtual}/${anoAtual}`
-            }
+        }
 
         res.status(200).send(`Transferencia realizada dia ${dataAtual()}`)
 
