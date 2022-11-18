@@ -15,10 +15,10 @@ export const clientes: tipo.Cliente[] = [
     {
         id: 2,
         nome: "Guilherme",
-        CPF: "345.456.678-23",
+        CPF: "333.543.518-45",
         nascimento: "30/01/1997",
         extrato: {
-            saldo: 0,
+            saldo: 163450,
             data: "11/10/90",
             descricao: "asdasdasd dadasd ad ad",
         }
