@@ -324,7 +324,6 @@ app.put('/transferencia',(req:Request, res:Response) =>{
             }
         })
 
-
         // Conta destinatario.
          clientes.find((destino) =>{
             if(destino.CPF === CPFDestino){
@@ -339,6 +338,14 @@ app.put('/transferencia',(req:Request, res:Response) =>{
             let diaAtual = dataAtual.getUTCDate();
             return `${diaAtual}/${mesAtual}/${anoAtual}`
         }
+
+        // Impedindo transferencia por falta de saldo.
+        let semSaldo = clientes.find((titular) =>{
+            if(titular.CPF === CPF && titular.extrato.saldo < valor){
+                errorCode
+                throw new Error("Saldo insuficiente para transferencia.");
+            }
+        })
 
         res.status(200).send(`Transferencia realizada dia ${dataAtual()}`)
 
