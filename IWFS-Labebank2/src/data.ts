@@ -40,7 +40,7 @@ export const clientes: tipo.Cliente[] = [
         CPF: "947.645.978-57",
         nascimento: "10/10/1990",
         extrato: {
-            saldo: 0,
+            saldo: 100,
             data: "13/10/90",
             descricao: "asdasdasd dadasd ad ad",
         }
